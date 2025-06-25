@@ -24,3 +24,5 @@ Cada carpeta aborda un tema clave con ejemplos prácticos, ejercicios y document
 ---
 
 ¿Listo para consolidar tus habilidades y dar el salto a React? 🚀 
+
+Facundo Guinazu

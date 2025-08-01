@@ -12,16 +12,39 @@ function renderTasks() {
   getTasks().forEach((task, idx) => {
     const li = document.createElement('li');
     li.textContent = task;
-    // TODO: Agrega aquí el botón y la lógica para editar la tarea
-    // TODO: Agrega aquí la lógica para filtrar tareas completadas/pendientes
-    // Botón para eliminar la tarea
-    const btn = document.createElement('button');
-    btn.textContent = 'Eliminar';
-    btn.onclick = () => {
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Editar';
+    editBtn.onclick = () => {
+      const newTask = prompt('Editar tarea:', task);
+      if (newTask && newTask.trim()) {
+        removeTask(idx);
+        addTask(newTask.trim());
+        renderTasks();
+      }
+    };
+    li.appendChild(editBtn);
+
+    const completeBtn = document.createElement('button');
+    completeBtn.textContent = task.startsWith('✓') ? 'Desmarcar' : 'Completar';
+    completeBtn.onclick = () => {
+      const updatedTask = task.startsWith('✓')
+        ? task.substring(2)
+        : '✓ ' + task;
+      removeTask(idx);
+      addTask(updatedTask);
+      renderTasks();
+    };
+    li.appendChild(completeBtn);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Eliminar';
+    deleteBtn.onclick = () => {
       removeTask(idx);
       renderTasks();
     };
-    li.appendChild(btn);
+    li.appendChild(deleteBtn);
+
     list.appendChild(li);
   });
 }
@@ -29,10 +52,12 @@ function renderTasks() {
 // Maneja el evento submit del formulario para agregar una tarea
 form.onsubmit = e => {
   e.preventDefault();
-  addTask(input.value);
-  input.value = '';
-  renderTasks();
+  if (input.value.trim()) {
+    addTask(input.value.trim());
+    input.value = '';
+    renderTasks();
+  }
 };
 
 // Render inicial de las tareas
-renderTasks(); 
+renderTasks();

@@ -15,31 +15,87 @@ async function fetchProducts() {
     li.textContent = `${prod.name} - $${prod.price}`;
     // Llama a showDetails al hacer clic en el nombre del producto
     li.onclick = () => showDetails(prod.id);
-    // Botón para eliminar (completar en el ejercicio)
+    // Botón para eliminar
     const btn = document.createElement('button');
     btn.textContent = 'Eliminar';
-    btn.onclick = e => {
+    btn.onclick = async e => {
       e.stopPropagation();
-      // TODO: Llama a deleteProduct y luego fetchProducts
+      // Llama a deleteProduct y luego fetchProducts
+      await deleteProduct(prod.id);
+      await fetchProducts();
     };
     li.appendChild(btn);
     list.appendChild(li);
   });
 }
 
-// EJERCICIO: Completa la función para crear un producto usando fetch POST
+// Función para crear un producto usando fetch POST
 async function createProduct(name, price, description) {
-  // TODO: Implementa el POST a la API
+  try {
+    const response = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        price: parseFloat(price),
+        description: description
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creando producto:', error);
+    alert('Error al crear el producto');
+  }
 }
 
-// EJERCICIO: Completa la función para eliminar un producto usando fetch DELETE
+// Función para eliminar un producto usando fetch DELETE
 async function deleteProduct(id) {
-  // TODO: Implementa el DELETE a la API
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    console.log('Producto eliminado exitosamente');
+  } catch (error) {
+    console.error('Error eliminando producto:', error);
+    alert('Error al eliminar el producto');
+  }
 }
 
-// EJERCICIO: Completa la función para mostrar detalles usando fetch GET /products/:id
+// Función para mostrar detalles usando fetch GET /products/:id
 async function showDetails(id) {
-  // TODO: Implementa el GET de detalles y muestra un alert con la info
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`);
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const product = await response.json();
+
+    // Muestra un alert con la información del producto
+    alert(`Detalles del Producto:
+    
+Nombre: ${product.name}
+Precio: $${product.price}
+Descripción: ${product.description || 'Sin descripción'}
+ID: ${product.id}`);
+
+  } catch (error) {
+    console.error('Error obteniendo detalles:', error);
+    alert('Error al obtener los detalles del producto');
+  }
 }
 
 // Maneja el submit del formulario para crear un producto
@@ -48,9 +104,13 @@ form.onsubmit = async e => {
   const name = document.getElementById('name').value;
   const price = document.getElementById('price').value;
   const description = document.getElementById('description').value;
-  // TODO: Llama a createProduct y luego fetchProducts
+
+  // Llama a createProduct y luego fetchProducts
+  await createProduct(name, price, description);
+  await fetchProducts();
+
   form.reset();
 };
 
 // Render inicial
-fetchProducts(); 
+fetchProducts();
